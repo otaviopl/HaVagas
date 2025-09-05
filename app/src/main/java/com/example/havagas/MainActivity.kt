@@ -1,7 +1,5 @@
 package com.example.havagas
 
-import android.app.AlertDialog
-import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
@@ -9,7 +7,9 @@ import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import com.example.havagas.databinding.ActivityMainBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.Calendar
+import android.app.DatePickerDialog
 
 class MainActivity : ComponentActivity() {
 
@@ -27,7 +27,6 @@ class MainActivity : ComponentActivity() {
         setupButtons()
     }
 
-    /** Substitui os antigos Spinners por Exposed Dropdowns (MaterialAutoCompleteTextView) */
     private fun setupDropdowns() {
         // Sexo
         val genderItems = listOf("Masculino", "Feminino", "Prefiro não informar")
@@ -42,11 +41,9 @@ class MainActivity : ComponentActivity() {
             "Mestrado", "Doutorado"
         )
         val eduView = (binding.educationLevelSp as AutoCompleteTextView)
-        eduView.setAdapter(
-            ArrayAdapter(this, android.R.layout.simple_list_item_1, educationItems)
-        )
-        eduView.setOnItemClickListener { parent, _, pos, _ ->
-            updateEducationGroups(parent.getItemAtPosition(pos).toString())
+        eduView.setAdapter(ArrayAdapter(this, android.R.layout.simple_list_item_1, educationItems))
+        eduView.setOnItemClickListener { parent, _, position, _ ->
+            updateEducationGroups(parent.getItemAtPosition(position).toString())
         }
     }
 
@@ -86,14 +83,13 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun setupConditionalSections() {
-        // Mostrar/ocultar celular
         binding.addCellphoneCb.setOnCheckedChangeListener { _, checked ->
             binding.cellphoneContainer.visibility = if (checked) View.VISIBLE else View.GONE
         }
     }
 
     private fun setupButtons() {
-        // Limpar
+        // Limpar formulário
         binding.clearBtn.setOnClickListener {
             binding.nomeEt.text?.clear()
             binding.emailEt.text?.clear()
@@ -121,31 +117,28 @@ class MainActivity : ComponentActivity() {
             binding.vagasInteresseEt.text?.clear()
 
             updateEducationGroups("")
-
             Toast.makeText(this, "Formulário limpo.", Toast.LENGTH_SHORT).show()
         }
 
-        // Salvar (mostra só o que foi preenchido)
+        // Salvar: mostra somente campos preenchidos
         binding.saveBtn.setOnClickListener {
             // Validação mínima
             if (binding.nomeEt.text.isNullOrBlank()) {
-                binding.nomeEt.error = "Informe o nome"
-                return@setOnClickListener
+                binding.nomeEt.error = "Informe o nome"; return@setOnClickListener
             }
             if (binding.emailEt.text.isNullOrBlank()) {
-                binding.emailEt.error = "Informe o e-mail"
-                return@setOnClickListener
+                binding.emailEt.error = "Informe o e-mail"; return@setOnClickListener
             }
 
-            val lines = mutableListOf<String>()
+            val out = mutableListOf<String>()
             fun add(label: String, value: String?) {
                 val v = value?.trim().orEmpty()
-                if (v.isNotEmpty()) lines.add("$label: $v")
+                if (v.isNotEmpty()) out += "$label: $v"
             }
 
             add("Nome", binding.nomeEt.text?.toString())
             add("E-mail", binding.emailEt.text?.toString())
-            if (binding.emailUpdatesCb.isChecked) lines.add("Receber e-mails: Sim")
+            if (binding.emailUpdatesCb.isChecked) out += "Receber e-mails: Sim"
 
             add("Telefone", binding.phoneEt.text?.toString())
             val phoneType = when (binding.phoneTypeGroup.checkedButtonId) {
@@ -162,17 +155,19 @@ class MainActivity : ComponentActivity() {
             add("Sexo", (binding.genderSp as AutoCompleteTextView).text?.toString())
             add("Data de nascimento", binding.birthDateEt.text?.toString())
 
-            val education = (binding.educationLevelSp as AutoCompleteTextView).text?.toString().orEmpty()
+            val education =
+                (binding.educationLevelSp as AutoCompleteTextView).text?.toString().orEmpty()
             add("Formação", education)
-
             when (education) {
                 "Fundamental", "Médio" -> {
                     add("Ano de formatura", binding.fundamentalMedioYearEt.text?.toString())
                 }
+
                 "Graduação", "Especialização" -> {
                     add("Ano de conclusão", binding.graduacaoEspecYearEt.text?.toString())
                     add("Instituição", binding.graduacaoEspecInstitutionEt.text?.toString())
                 }
+
                 "Mestrado", "Doutorado" -> {
                     add("Ano de conclusão", binding.mestradoDoutoradoYearEt.text?.toString())
                     add("Instituição", binding.mestradoDoutoradoInstitutionEt.text?.toString())
@@ -183,11 +178,9 @@ class MainActivity : ComponentActivity() {
 
             add("Vagas de interesse", binding.vagasInteresseEt.text?.toString())
 
-            val msg = if (lines.isEmpty()) "Nenhum campo preenchido." else lines.joinToString("\n")
-
-            AlertDialog.Builder(this)
+            MaterialAlertDialogBuilder(this)
                 .setTitle("Resumo do cadastro")
-                .setMessage(msg)
+                .setMessage(if (out.isEmpty()) "Nenhum campo preenchido." else out.joinToString("\n"))
                 .setPositiveButton("OK", null)
                 .show()
         }
