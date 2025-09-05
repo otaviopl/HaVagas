@@ -1,5 +1,6 @@
 package com.example.havagas
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
@@ -48,37 +49,24 @@ class MainActivity : ComponentActivity() {
         )
 
         binding.educationLevelSp.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                val selected = parent?.getItemAtPosition(position)?.toString().orEmpty()
-                updateEducationGroups(selected)
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, pos: Int, id: Long) {
+                updateEducationGroups(parent?.getItemAtPosition(pos)?.toString().orEmpty())
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                updateEducationGroups("") // esconde tudo
+                updateEducationGroups("")
             }
         }
     }
 
     private fun updateEducationGroups(level: String) {
-        // Esconde todos
         binding.fundamentalMedioGroup.visibility = View.GONE
         binding.graduacaoEspecGroup.visibility = View.GONE
         binding.mestradoDoutoradoGroup.visibility = View.GONE
 
         when (level) {
-            "Fundamental", "Médio" -> {
-                binding.fundamentalMedioGroup.visibility = View.VISIBLE
-            }
-            "Graduação", "Especialização" -> {
-                binding.graduacaoEspecGroup.visibility = View.VISIBLE
-            }
-            "Mestrado", "Doutorado" -> {
-                binding.mestradoDoutoradoGroup.visibility = View.VISIBLE
-            }
+            "Fundamental", "Médio" -> binding.fundamentalMedioGroup.visibility = View.VISIBLE
+            "Graduação", "Especialização" -> binding.graduacaoEspecGroup.visibility = View.VISIBLE
+            "Mestrado", "Doutorado" -> binding.mestradoDoutoradoGroup.visibility = View.VISIBLE
         }
     }
 
@@ -129,7 +117,6 @@ class MainActivity : ComponentActivity() {
             binding.mestradoDoutoradoAdvisorEt.text?.clear()
             binding.vagasInteresseEt.text?.clear()
 
-            // Esconde grupos condicionais
             updateEducationGroups("")
             binding.cellphoneContainer.visibility = View.GONE
 
@@ -137,58 +124,71 @@ class MainActivity : ComponentActivity() {
         }
 
         binding.saveBtn.setOnClickListener {
-            val nome = binding.nomeEt.text?.toString().orEmpty()
-            val email = binding.emailEt.text?.toString().orEmpty()
-            val recebeEmails = binding.emailUpdatesCb.isChecked
-            val phone = binding.phoneEt.text?.toString().orEmpty()
+            // Validação mínima
+            if (binding.nomeEt.text.isNullOrBlank()) {
+                binding.nomeEt.error = "Informe o nome"
+                return@setOnClickListener
+            }
+            if (binding.emailEt.text.isNullOrBlank()) {
+                binding.emailEt.error = "Informe o e-mail"
+                return@setOnClickListener
+            }
+
+            // Monta apenas campos preenchidos
+            val lines = mutableListOf<String>()
+
+            fun add(label: String, value: String?) {
+                val v = value?.trim().orEmpty()
+                if (v.isNotEmpty()) lines.add("$label: $v")
+            }
+
+            add("Nome", binding.nomeEt.text?.toString())
+            add("E-mail", binding.emailEt.text?.toString())
+            if (binding.emailUpdatesCb.isChecked) lines.add("Receber e-mails: Sim")
+
+            add("Telefone", binding.phoneEt.text?.toString())
             val phoneType = when (binding.phoneTypeRg.checkedRadioButtonId) {
                 binding.phoneTypeCommercialRb.id -> "Comercial"
                 binding.phoneTypeResidentialRb.id -> "Residencial"
                 else -> ""
             }
-            val hasCell = binding.addCellphoneCb.isChecked
-            val cellphone = binding.cellphoneEt.text?.toString().orEmpty()
-            val gender = binding.genderSp.selectedItem?.toString().orEmpty()
-            val birth = binding.birthDateEt.text?.toString().orEmpty()
+            if (phoneType.isNotEmpty()) add("Tipo do telefone", phoneType)
+
+            if (binding.addCellphoneCb.isChecked) {
+                add("Celular", binding.cellphoneEt.text?.toString())
+            }
+
+            add("Sexo", binding.genderSp.selectedItem?.toString())
+            add("Data de nascimento", binding.birthDateEt.text?.toString())
+
             val education = binding.educationLevelSp.selectedItem?.toString().orEmpty()
-            val vagas = binding.vagasInteresseEt.text?.toString().orEmpty()
+            add("Formação", education)
 
-            // Extras por nível
-            val eduExtra = when (education) {
-                "Fundamental", "Médio" ->
-                    "Ano formatura: ${binding.fundamentalMedioYearEt.text}"
-                "Graduação", "Especialização" ->
-                    "Ano conclusão: ${binding.graduacaoEspecYearEt.text}, Instituição: ${binding.graduacaoEspecInstitutionEt.text}"
-                "Mestrado", "Doutorado" ->
-                    "Ano: ${binding.mestradoDoutoradoYearEt.text}, Inst.: ${binding.mestradoDoutoradoInstitutionEt.text}, " +
-                            "Título: ${binding.mestradoDoutoradoTitleEt.text}, Orient.: ${binding.mestradoDoutoradoAdvisorEt.text}"
-                else -> ""
-            }
-
-            // Validação mínima
-            if (nome.isBlank()) {
-                binding.nomeEt.error = "Informe o nome"
-                return@setOnClickListener
-            }
-            if (email.isBlank()) {
-                binding.emailEt.error = "Informe o e-mail"
-                return@setOnClickListener
+            when (education) {
+                "Fundamental", "Médio" -> {
+                    add("Ano de formatura", binding.fundamentalMedioYearEt.text?.toString())
+                }
+                "Graduação", "Especialização" -> {
+                    add("Ano de conclusão", binding.graduacaoEspecYearEt.text?.toString())
+                    add("Instituição", binding.graduacaoEspecInstitutionEt.text?.toString())
+                }
+                "Mestrado", "Doutorado" -> {
+                    add("Ano de conclusão", binding.mestradoDoutoradoYearEt.text?.toString())
+                    add("Instituição", binding.mestradoDoutoradoInstitutionEt.text?.toString())
+                    add("Título da monografia", binding.mestradoDoutoradoTitleEt.text?.toString())
+                    add("Orientador", binding.mestradoDoutoradoAdvisorEt.text?.toString())
+                }
             }
 
-            // Aqui você pode enviar para API/banco
-            val resumo = buildString {
-                appendLine("Salvo!")
-                appendLine("Nome: $nome")
-                appendLine("E-mail: $email (receber updates: $recebeEmails)")
-                appendLine("Telefone: $phone ${if (phoneType.isNotBlank()) "($phoneType)" else ""}")
-                if (hasCell) appendLine("Celular: $cellphone")
-                appendLine("Sexo: $gender")
-                appendLine("Nascimento: $birth")
-                appendLine("Formação: $education")
-                if (eduExtra.isNotBlank()) appendLine(eduExtra)
-                appendLine("Vagas: $vagas")
-            }
-            Toast.makeText(this, resumo, Toast.LENGTH_LONG).show()
+            add("Vagas de interesse", binding.vagasInteresseEt.text?.toString())
+
+            val msg = if (lines.isEmpty()) "Nenhum campo preenchido." else lines.joinToString("\n")
+
+            AlertDialog.Builder(this)
+                .setTitle("Resumo do cadastro")
+                .setMessage(msg)
+                .setPositiveButton("OK", null)
+                .show()
         }
     }
 }

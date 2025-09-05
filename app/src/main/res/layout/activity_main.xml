@@ -18,7 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Nome completo"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName|textCapWords"
+            android:maxLines="1" />
 
         <!-- E-mail + opt-in -->
         <EditText
@@ -26,7 +27,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="E-mail"
-            android:inputType="textEmailAddress" />
+            android:inputType="textEmailAddress"
+            android:maxLines="1" />
 
         <CheckBox
             android:id="@+id/emailUpdatesCb"
@@ -40,7 +42,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Telefone"
-            android:inputType="phone" />
+            android:inputType="phone"
+            android:maxLength="20"
+            android:maxLines="1" />
 
         <RadioGroup
             android:id="@+id/phoneTypeRg"
@@ -83,7 +87,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Telefone celular"
-                android:inputType="phone" />
+                android:inputType="phone"
+                android:maxLength="20"
+                android:maxLines="1" />
         </LinearLayout>
 
         <!-- Sexo -->
@@ -98,14 +104,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <!-- Data de nascimento -->
+        <!-- Data de nascimento (abre DatePicker; sem teclado) -->
         <EditText
             android:id="@+id/birthDateEt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Data de nascimento"
+            android:hint="Data de nascimento (dd/mm/aaaa)"
             android:focusable="false"
-            android:clickable="true" />
+            android:clickable="true"
+            android:maxLines="1" />
 
         <!-- Formação (nível) -->
         <TextView
@@ -133,7 +140,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Ano de formatura"
-                android:inputType="number" />
+                android:inputType="number"
+                android:maxLength="4"
+                android:maxLines="1" />
         </LinearLayout>
 
         <!-- Graduação / Especialização: ano + instituição -->
@@ -150,7 +159,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Ano de conclusão"
-                android:inputType="number" />
+                android:inputType="number"
+                android:maxLength="4"
+                android:maxLines="1" />
 
             <EditText
                 android:id="@+id/graduacaoEspecInstitutionEt"
@@ -174,7 +185,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Ano de conclusão"
-                android:inputType="number" />
+                android:inputType="number"
+                android:maxLength="4"
+                android:maxLines="1" />
 
             <EditText
                 android:id="@+id/mestradoDoutoradoInstitutionEt"
@@ -205,7 +218,9 @@
             android:layout_height="120dp"
             android:gravity="top|start"
             android:hint="Vagas de interesse"
-            android:inputType="textMultiLine" />
+            android:inputType="textMultiLine"
+            android:minLines="3"
+            android:maxLines="6" />
 
         <!-- Botões -->
         <LinearLayout
