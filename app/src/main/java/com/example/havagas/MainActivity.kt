@@ -12,6 +12,24 @@ import java.util.Calendar
 import android.app.DatePickerDialog
 
 class MainActivity : ComponentActivity() {
+    private val EMAIL_REGEX =
+        "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$".toRegex(RegexOption.IGNORE_CASE)
+
+        // Somente dígitos
+        //  - Celular: [55] + [DD] + 9 + 8 dígitos  (ex.: +55 11 9 1234 5678 -> 13 dígitos)
+        //  - Fixo:    [55] + [DD] + 8 dígitos      (ex.: +55 11 1234 5678  -> 12 dígitos)
+        // Sem DDI/DDD também funciona (8 ou 9 dígitos).
+
+    private val BR_MOBILE_DIGITS = "^(?:55)?(?:\\d{2})?9\\d{8}$".toRegex()
+    private val BR_LANDLINE_DIGITS = "^(?:55)?(?:\\d{2})?[2-5]\\d{7}$".toRegex()
+
+    private fun isValidEmail(s: String): Boolean =
+        EMAIL_REGEX.matches(s.trim())
+
+    private fun isValidBrPhone(s: String): Boolean {
+        val d = s.replace("\\D".toRegex(), "") // remove tudo que não é dígito
+        return BR_MOBILE_DIGITS.matches(d) || BR_LANDLINE_DIGITS.matches(d)
+    }
 
     private lateinit var binding: ActivityMainBinding
 
@@ -128,6 +146,27 @@ class MainActivity : ComponentActivity() {
             }
             if (binding.emailEt.text.isNullOrBlank()) {
                 binding.emailEt.error = "Informe o e-mail"; return@setOnClickListener
+            }
+            val email = binding.emailEt.text!!.toString()
+
+            if (!isValidEmail(email)) {
+                binding.emailEt.error = "E-mail inválido"
+                return@setOnClickListener
+            }
+            val phone = binding.phoneEt.text?.toString().orEmpty()
+
+            if (phone.isNotBlank() && !isValidBrPhone(phone)) {
+                binding.phoneEt.error = "Telefone inválido"
+                return@setOnClickListener
+            }
+
+            // 3) Celular (obrigatório se a chavinha 'Adicionar celular' estiver marcada)
+            if (binding.addCellphoneCb.isChecked) {
+                val cell = binding.cellphoneEt.text?.toString().orEmpty()
+                if (cell.isBlank() || !isValidBrPhone(cell)) {
+                    binding.cellphoneEt.error = "Celular inválido"
+                    return@setOnClickListener
+                }
             }
 
             val out = mutableListOf<String>()
