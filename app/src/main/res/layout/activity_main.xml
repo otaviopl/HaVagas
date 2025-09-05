@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/formScroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,67 +14,94 @@
         android:orientation="vertical">
 
         <!-- Nome completo -->
-        <EditText
-            android:id="@+id/nomeEt"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Nome completo"
-            android:inputType="textPersonName|textCapWords"
-            android:maxLines="1" />
+            app:endIconMode="clear_text">
 
-        <!-- E-mail + opt-in -->
-        <EditText
-            android:id="@+id/emailEt"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/nomeEt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName|textCapWords"
+                android:autofillHints="name"
+                android:imeOptions="actionNext"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- E-mail -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="E-mail"
-            android:inputType="textEmailAddress"
-            android:maxLines="1" />
+            app:endIconMode="clear_text">
 
-        <CheckBox
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/emailEt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:autofillHints="emailAddress"
+                android:imeOptions="actionNext"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Opt-in e-mails -->
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/emailUpdatesCb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Quero receber atualizações por e-mail" />
 
-        <!-- Telefone + tipo -->
-        <EditText
-            android:id="@+id/phoneEt"
+        <!-- Telefone -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Telefone"
-            android:inputType="phone"
-            android:maxLength="20"
-            android:maxLines="1" />
+            android:hint="Telefone">
 
-        <RadioGroup
-            android:id="@+id/phoneTypeRg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="4dp">
-
-            <RadioButton
-                android:id="@+id/phoneTypeCommercialRb"
-                android:layout_width="wrap_content"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/phoneEt"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="phone"
+                android:maxLength="20"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Tipo de telefone (Segmented) -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/phoneTypeGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/phoneTypeCommercialRb"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Comercial" />
 
-            <RadioButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/phoneTypeResidentialRb"
-                android:layout_width="wrap_content"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Residencial" />
-        </RadioGroup>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <!-- Toggle para adicionar celular -->
-        <CheckBox
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/addCellphoneCb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Adicionar telefone celular" />
 
-        <!-- Container Celular (exibido somente se marcado) -->
+        <!-- Celular (condicional) -->
         <LinearLayout
             android:id="@+id/cellphoneContainer"
             android:layout_width="match_parent"
@@ -82,51 +110,71 @@
             android:paddingTop="8dp"
             android:visibility="gone">
 
-            <EditText
-                android:id="@+id/cellphoneEt"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Telefone celular"
-                android:inputType="phone"
-                android:maxLength="20"
-                android:maxLines="1" />
+                android:hint="Telefone celular">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/cellphoneEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="phone"
+                    android:maxLength="20"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- Sexo -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:text="Sexo" />
-
-        <Spinner
-            android:id="@+id/genderSp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <!-- Data de nascimento (abre DatePicker; sem teclado) -->
-        <EditText
-            android:id="@+id/birthDateEt"
+        <!-- Sexo (Exposed Dropdown) -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Data de nascimento (dd/mm/aaaa)"
-            android:focusable="false"
-            android:clickable="true"
-            android:maxLines="1" />
+            android:hint="Sexo"
+            android:paddingTop="8dp">
 
-        <!-- Formação (nível) -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:text="Formação" />
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/genderSp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:focusable="false"
+                android:clickable="true" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <Spinner
-            android:id="@+id/educationLevelSp"
+        <!-- Data de nascimento -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:hint="Data de nascimento (dd/mm/aaaa)">
 
-        <!-- Fundamental / Médio: ano de formatura -->
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/birthDateEt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:clickable="true"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Formação (Exposed Dropdown) -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Formação"
+            android:paddingTop="8dp">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/educationLevelSp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:focusable="false"
+                android:clickable="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Fundamental / Médio -->
         <LinearLayout
             android:id="@+id/fundamentalMedioGroup"
             android:layout_width="match_parent"
@@ -135,17 +183,22 @@
             android:paddingTop="8dp"
             android:visibility="gone">
 
-            <EditText
-                android:id="@+id/fundamentalMedioYearEt"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Ano de formatura"
-                android:inputType="number"
-                android:maxLength="4"
-                android:maxLines="1" />
+                android:hint="Ano de formatura">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/fundamentalMedioYearEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- Graduação / Especialização: ano + instituição -->
+        <!-- Graduação / Especialização -->
         <LinearLayout
             android:id="@+id/graduacaoEspecGroup"
             android:layout_width="match_parent"
@@ -154,24 +207,34 @@
             android:paddingTop="8dp"
             android:visibility="gone">
 
-            <EditText
-                android:id="@+id/graduacaoEspecYearEt"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Ano de conclusão"
-                android:inputType="number"
-                android:maxLength="4"
-                android:maxLines="1" />
+                android:hint="Ano de conclusão">
 
-            <EditText
-                android:id="@+id/graduacaoEspecInstitutionEt"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/graduacaoEspecYearEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Instituição"
-                android:inputType="textCapWords" />
+                android:hint="Instituição">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/graduacaoEspecInstitutionEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- Mestrado / Doutorado: ano + instituição + título + orientador -->
+        <!-- Mestrado / Doutorado -->
         <LinearLayout
             android:id="@+id/mestradoDoutoradoGroup"
             android:layout_width="match_parent"
@@ -180,49 +243,74 @@
             android:paddingTop="8dp"
             android:visibility="gone">
 
-            <EditText
-                android:id="@+id/mestradoDoutoradoYearEt"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Ano de conclusão"
-                android:inputType="number"
-                android:maxLength="4"
-                android:maxLines="1" />
+                android:hint="Ano de conclusão">
 
-            <EditText
-                android:id="@+id/mestradoDoutoradoInstitutionEt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Instituição"
-                android:inputType="textCapWords" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/mestradoDoutoradoYearEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <EditText
-                android:id="@+id/mestradoDoutoradoTitleEt"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Título da monografia"
-                android:inputType="textCapSentences" />
+                android:hint="Instituição">
 
-            <EditText
-                android:id="@+id/mestradoDoutoradoAdvisorEt"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/mestradoDoutoradoInstitutionEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Orientador"
-                android:inputType="textCapWords" />
+                android:hint="Título da monografia">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/mestradoDoutoradoTitleEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Orientador">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/mestradoDoutoradoAdvisorEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
         <!-- Vagas de interesse -->
-        <EditText
-            android:id="@+id/vagasInteresseEt"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:gravity="top|start"
-            android:hint="Vagas de interesse"
-            android:inputType="textMultiLine"
-            android:minLines="3"
-            android:maxLines="6" />
+            android:layout_height="wrap_content"
+            android:hint="Vagas de interesse">
 
-        <!-- Botões -->
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/vagasInteresseEt"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:gravity="top|start"
+                android:inputType="textMultiLine"
+                android:minLines="3"
+                android:maxLines="6" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Ações -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -230,8 +318,9 @@
             android:orientation="horizontal"
             android:paddingTop="12dp">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/clearBtn"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Limpar" />
@@ -240,8 +329,9 @@
                 android:layout_width="12dp"
                 android:layout_height="match_parent" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/saveBtn"
+                style="?attr/materialButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Salvar" />

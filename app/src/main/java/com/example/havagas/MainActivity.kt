@@ -4,8 +4,8 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import com.example.havagas.databinding.ActivityMainBinding
@@ -21,19 +21,18 @@ class MainActivity : ComponentActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupSpinners()
+        setupDropdowns()
         setupBirthDatePicker()
         setupConditionalSections()
         setupButtons()
     }
 
-    private fun setupSpinners() {
+    /** Substitui os antigos Spinners por Exposed Dropdowns (MaterialAutoCompleteTextView) */
+    private fun setupDropdowns() {
         // Sexo
         val genderItems = listOf("Masculino", "Feminino", "Prefiro não informar")
-        binding.genderSp.adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            genderItems
+        (binding.genderSp as AutoCompleteTextView).setAdapter(
+            ArrayAdapter(this, android.R.layout.simple_list_item_1, genderItems)
         )
 
         // Formação
@@ -42,19 +41,12 @@ class MainActivity : ComponentActivity() {
             "Graduação", "Especialização",
             "Mestrado", "Doutorado"
         )
-        binding.educationLevelSp.adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            educationItems
+        val eduView = (binding.educationLevelSp as AutoCompleteTextView)
+        eduView.setAdapter(
+            ArrayAdapter(this, android.R.layout.simple_list_item_1, educationItems)
         )
-
-        binding.educationLevelSp.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, pos: Int, id: Long) {
-                updateEducationGroups(parent?.getItemAtPosition(pos)?.toString().orEmpty())
-            }
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                updateEducationGroups("")
-            }
+        eduView.setOnItemClickListener { parent, _, pos, _ ->
+            updateEducationGroups(parent.getItemAtPosition(pos).toString())
         }
     }
 
@@ -71,21 +63,25 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun setupBirthDatePicker() {
-        binding.birthDateEt.setOnClickListener {
-            val c = Calendar.getInstance()
-            val y = c.get(Calendar.YEAR)
-            val m = c.get(Calendar.MONTH)
-            val d = c.get(Calendar.DAY_OF_MONTH)
+        binding.birthDateEt.apply {
+            isFocusable = false
+            isClickable = true
+            setOnClickListener {
+                val c = Calendar.getInstance()
+                val y = c.get(Calendar.YEAR)
+                val m = c.get(Calendar.MONTH)
+                val d = c.get(Calendar.DAY_OF_MONTH)
 
-            DatePickerDialog(
-                this,
-                { _, year, month, dayOfMonth ->
-                    val dd = dayOfMonth.toString().padStart(2, '0')
-                    val mm = (month + 1).toString().padStart(2, '0')
-                    binding.birthDateEt.setText("$dd/$mm/$year")
-                },
-                y, m, d
-            ).show()
+                DatePickerDialog(
+                    this@MainActivity,
+                    { _, year, month, dayOfMonth ->
+                        val dd = dayOfMonth.toString().padStart(2, '0')
+                        val mm = (month + 1).toString().padStart(2, '0')
+                        setText("$dd/$mm/$year")
+                    },
+                    y, m, d
+                ).show()
+            }
         }
     }
 
@@ -97,17 +93,23 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun setupButtons() {
+        // Limpar
         binding.clearBtn.setOnClickListener {
             binding.nomeEt.text?.clear()
             binding.emailEt.text?.clear()
             binding.emailUpdatesCb.isChecked = false
+
             binding.phoneEt.text?.clear()
-            binding.phoneTypeRg.clearCheck()
+            binding.phoneTypeGroup.clearChecked()
+
             binding.addCellphoneCb.isChecked = false
             binding.cellphoneEt.text?.clear()
-            binding.genderSp.setSelection(0)
+            binding.cellphoneContainer.visibility = View.GONE
+
+            (binding.genderSp as AutoCompleteTextView).setText("", false)
             binding.birthDateEt.text?.clear()
-            binding.educationLevelSp.setSelection(0)
+
+            (binding.educationLevelSp as AutoCompleteTextView).setText("", false)
             binding.fundamentalMedioYearEt.text?.clear()
             binding.graduacaoEspecYearEt.text?.clear()
             binding.graduacaoEspecInstitutionEt.text?.clear()
@@ -115,14 +117,15 @@ class MainActivity : ComponentActivity() {
             binding.mestradoDoutoradoInstitutionEt.text?.clear()
             binding.mestradoDoutoradoTitleEt.text?.clear()
             binding.mestradoDoutoradoAdvisorEt.text?.clear()
+
             binding.vagasInteresseEt.text?.clear()
 
             updateEducationGroups("")
-            binding.cellphoneContainer.visibility = View.GONE
 
             Toast.makeText(this, "Formulário limpo.", Toast.LENGTH_SHORT).show()
         }
 
+        // Salvar (mostra só o que foi preenchido)
         binding.saveBtn.setOnClickListener {
             // Validação mínima
             if (binding.nomeEt.text.isNullOrBlank()) {
@@ -134,9 +137,7 @@ class MainActivity : ComponentActivity() {
                 return@setOnClickListener
             }
 
-            // Monta apenas campos preenchidos
             val lines = mutableListOf<String>()
-
             fun add(label: String, value: String?) {
                 val v = value?.trim().orEmpty()
                 if (v.isNotEmpty()) lines.add("$label: $v")
@@ -147,7 +148,7 @@ class MainActivity : ComponentActivity() {
             if (binding.emailUpdatesCb.isChecked) lines.add("Receber e-mails: Sim")
 
             add("Telefone", binding.phoneEt.text?.toString())
-            val phoneType = when (binding.phoneTypeRg.checkedRadioButtonId) {
+            val phoneType = when (binding.phoneTypeGroup.checkedButtonId) {
                 binding.phoneTypeCommercialRb.id -> "Comercial"
                 binding.phoneTypeResidentialRb.id -> "Residencial"
                 else -> ""
@@ -158,10 +159,10 @@ class MainActivity : ComponentActivity() {
                 add("Celular", binding.cellphoneEt.text?.toString())
             }
 
-            add("Sexo", binding.genderSp.selectedItem?.toString())
+            add("Sexo", (binding.genderSp as AutoCompleteTextView).text?.toString())
             add("Data de nascimento", binding.birthDateEt.text?.toString())
 
-            val education = binding.educationLevelSp.selectedItem?.toString().orEmpty()
+            val education = (binding.educationLevelSp as AutoCompleteTextView).text?.toString().orEmpty()
             add("Formação", education)
 
             when (education) {
